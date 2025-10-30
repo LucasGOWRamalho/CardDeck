@@ -1,0 +1,30 @@
+[build]
+builder = "DOCKERFILE"
+
+[deploy]
+startCommand = "npm run start:prod"
+
+# Configurações específicas para Node.js/NestJS
+[nixpacks]
+plan = """
+  version = "1"
+
+  [[phases]]
+    name = "setup"
+    commands = [
+      "corepack enable",
+      "corepack prepare pnpm@latest --activate"
+    ]
+
+  [[phases]]
+    name = "install"
+    commands = [
+      "pnpm install"
+    ]
+
+  [[phases]]
+    name = "build"
+    commands = [
+      "pnpm run build"
+    ]
+"""
