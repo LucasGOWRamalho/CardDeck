@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useCard } from "../context/CardContext";
-import { Card } from "../types/card";
+import { Card, Transaction } from "../types/card";
 import { useState } from "react";
 
 export function CardFormBack({ card, setCard }: { 
@@ -26,6 +26,9 @@ export function CardFormBack({ card, setCard }: {
         bank: card.bank || "",
         balance: card.balance || 0,
         creditLimit: card.creditLimit || 0,
+        // Adicionar as propriedades que estavam faltando
+        availableLimit: card.creditLimit || 0, // Limite disponível começa igual ao limite total
+        transactions: [] as Transaction[] // Array vazio de transações
       };
 
       await addCard(cardData);
@@ -44,7 +47,7 @@ export function CardFormBack({ card, setCard }: {
         <input
           type="text"
           placeholder="MM/AA"
-          className="border p-2 rounded w-full"
+          className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
           value={card.validThru || ""}
           onChange={(e) => setCard({ ...card, validThru: e.target.value })}
           required
@@ -56,7 +59,7 @@ export function CardFormBack({ card, setCard }: {
         <input
           type="text"
           placeholder="123"
-          className="border p-2 rounded w-full"
+          className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
           value={card.cvv || ""}
           onChange={(e) => setCard({ ...card, cvv: e.target.value })}
           maxLength={3}
@@ -69,7 +72,7 @@ export function CardFormBack({ card, setCard }: {
         <input
           type="text"
           placeholder="000.000.000-00"
-          className="border p-2 rounded w-full"
+          className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
           value={card.cpf || ""}
           onChange={(e) => setCard({ ...card, cpf: e.target.value })}
         />
@@ -79,7 +82,7 @@ export function CardFormBack({ card, setCard }: {
         Data de nascimento (Opcional)
         <input
           type="date"
-          className="border p-2 rounded w-full"
+          className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
           value={card.birthDate || ""}
           onChange={(e) => setCard({ ...card, birthDate: e.target.value })}
         />
