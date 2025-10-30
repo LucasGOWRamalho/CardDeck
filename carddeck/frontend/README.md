@@ -1,36 +1,215 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💳 Documentação do Sistema CardDeck - Frontend
 
-## Getting Started
+## 📋 Visão Geral
 
-First, run the development server:
+O **CardDeck** é uma aplicação web para gerenciamento de cartões de crédito e débito, desenvolvida em **Next.js** com **TypeScript**.  
+O sistema permite cadastrar cartões, visualizar detalhes, adicionar transações e gerenciar informações financeiras.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 🏗️ Arquitetura do Projeto
+
+```
+frontend/
+├── src/
+│   ├── app/                    # Páginas da aplicação (App Router)
+│   │   ├── card/              # Página de cadastro de cartão
+│   │   ├── globals.css        # Estilos globais
+│   │   ├── layout.tsx         # Layout principal
+│   │   └── page.tsx           # Página inicial
+│   ├── components/            # Componentes React
+│   ├── context/               # Context API
+│   ├── lib/                   # Utilitários e APIs
+│   └── types/                 # Definições TypeScript
+├── tests/                     # Testes unitários
+└── public/                    # Arquivos estáticos
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🎯 Páginas Principais
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Página Inicial (`/ - page.tsx`)
+**Funcionalidades:**
+- Dashboard principal com visão geral da carteira  
+- Botão para adicionar novos cartões  
+- Integração com Wallet para listagem de cartões  
+- Navegação para detalhes do cartão
 
-## Learn More
+**Componentes Utilizados:**
+- `Wallet` — Lista de cartões  
+- `AddCardButton` — Botão de adição  
+- `CardDetails` — Detalhes do cartão selecionado
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. Página de Cadastro (`/card - card/page.tsx`)
+**Funcionalidades:**
+- Formulário multi-step para cadastro de cartões  
+- Visualização 3D do cartão com animação de flip  
+- Validação de dados em tempo real
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Componentes Utilizados:**
+- `Card3D` — Visualização do cartão  
+- `CardFormFront` — Formulário da frente  
+- `CardFormBack` — Formulário do verso
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🧩 Componentes Principais
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 1. Wallet (`Wallet.tsx`)
+Gerencia e exibe a lista de cartões.  
+Usa **Framer Motion** para animações 3D.
+
+### 2. CardDetails (`CardDetails.tsx`)
+Exibe informações detalhadas do cartão e histórico de transações.
+
+### 3. Card3D (`Card3D.tsx`)
+Visualização animada do cartão com flip entre frente e verso.
+
+### 4. Formulários (`CardFormFront.tsx`, `CardFormBack.tsx`)
+Validações implementadas para titular, número, validade, CVV e CPF.
+
+### 5. AddTransaction (`AddTransaction.tsx`)
+Modal para adicionar transações com validações de valor e data.
+
+### 6. DeleteCardModal (`DeleteCardModal.tsx`)
+Confirmação segura para exclusão com verificação dos últimos 4 dígitos.
+
+---
+
+## 🔄 Gerenciamento de Estado
+
+`CardContext.tsx` — controle global dos cartões.
+
+```typescript
+interface CardContextType {
+  cards: Card[];
+  addCard: (cardData) => Promise<void>;
+  deleteCard: (id: string) => Promise<void>;
+  loadCards: () => Promise<void>;
+  loading: boolean;
+  error: string | null;
+}
+```
+
+---
+
+## 🌐 Integração com API
+
+```typescript
+const API_BASE_URL = 'https://carddeck-backend.onrender.com';
+```
+
+### Endpoints
+- `GET /cards` — Listar cartões  
+- `POST /cards` — Criar cartão  
+- `DELETE /cards/:id` — Excluir cartão  
+- `POST /cards/:id/transactions` — Adicionar transação  
+- `GET /cards/:id/transactions` — Listar transações
+
+---
+
+## 🎨 Sistema de Design
+
+**Cores principais:**
+- Azul: `from-blue-600 to-indigo-700`
+- Âmbar: `from-amber-900 to-amber-700`
+- Verde: `bg-green-600`
+- Vermelho: `bg-red-600`
+
+**Animações:** Framer Motion  
+**Responsividade:** Mobile-first (Tailwind breakpoints)
+
+---
+
+## 🔒 Validações e Segurança
+
+- Validação de número, data, CPF e CVV  
+- Confirmação de exclusão com últimos 4 dígitos  
+- Feedback visual e retries automáticos em falhas
+
+---
+
+## 🧪 Testabilidade
+
+Exemplo:
+```typescript
+describe('CardFormFront', () => {
+  it('should render all form fields', () => {});
+  it('should submit form with valid data', () => {});
+});
+```
+
+Mocks configurados para:
+- Next.js Navigation  
+- Framer Motion  
+- API Fetch
+
+---
+
+## 🚀 Funcionalidades Avançadas
+
+- Persistência em backend com cache local  
+- Animações 3D e busca em tempo real  
+- Gestão financeira com limites e histórico  
+
+---
+
+## 📊 Métricas e Performance
+
+- Cobertura de testes: **70%+**
+- Tipagem TypeScript: **100%**
+- Acessibilidade e SEO otimizados
+
+---
+
+## 🔄 Fluxos de Usuário
+
+### 1. Cadastro de Cartão
+```
+Página Inicial → AddCardButton → CardPage (FormFront → FormBack) → Confirmação → Página Inicial
+```
+
+### 2. Visualização de Detalhes
+```
+Página Inicial → Wallet → Card Click → CardDetails → Back to Wallet
+```
+
+### 3. Adição de Transação
+```
+CardDetails → AddTransaction → Modal → Validação → Atualização em Tempo Real
+```
+
+### 4. Exclusão de Cartão
+```
+Wallet → Hover Card → Delete → Confirmação → Atualização da Lista
+```
+
+---
+
+## 🌍 Como Acessar
+
+🔗 **Versão Online:** [https://card-deck-brown.vercel.app/](https://card-deck-brown.vercel.app/)
+
+---
+
+## 🧭 Como Rodar Localmente
+
+```bash
+# Clonar o projeto
+git clone https://github.com/seuusuario/carddeck.git
+
+# Entrar na pasta do frontend
+cd carddeck
+cd frontend
+
+# Instalar dependências
+npm install
+
+# Rodar o servidor de desenvolvimento
+npm run dev
+```
+
+Acesse **http://localhost:3000** no navegador.

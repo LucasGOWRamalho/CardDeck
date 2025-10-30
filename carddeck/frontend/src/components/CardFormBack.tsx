@@ -168,87 +168,91 @@ export function CardFormBack({ card, setCard }: {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-md mx-auto bg-white shadow-lg p-6 rounded-2xl border border-gray-200">
       <div>
-        <label className="text-sm text-gray-700">
+        <label className="block text-sm font-semibold text-gray-800 mb-2">
           Data de Validade * (MM/AA)
-          <input
-            type="text"
-            placeholder="MM/AA"
-            className={`border p-2 rounded w-full focus:ring-2 focus:ring-blue-500 ${
-              errors.validThru ? 'border-red-500' : ''
-            }`}
-            value={card.validThru || ""}
-            onChange={(e) => handleFieldChange('validThru', e.target.value)}
-            maxLength={5}
-            required
-            disabled={submitting}
-          />
         </label>
+        <input
+          type="text"
+          placeholder="MM/AA"
+          className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+            errors.validThru ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'
+          }`}
+          value={card.validThru || ""}
+          onChange={(e) => handleFieldChange('validThru', e.target.value)}
+          maxLength={5}
+          required
+          disabled={submitting}
+        />
         {errors.validThru && (
-          <p className="text-red-500 text-xs mt-1">{errors.validThru}</p>
+          <p className="text-red-500 text-xs mt-1 font-medium">{errors.validThru}</p>
         )}
       </div>
 
       <div>
-        <label className="text-sm text-gray-700">
+        <label className="block text-sm font-semibold text-gray-800 mb-2">
           CVV * (xxx ou xxxx)
-          <input
-            type="text"
-            placeholder="123"
-            className={`border p-2 rounded w-full focus:ring-2 focus:ring-blue-500 ${
-              errors.cvv ? 'border-red-500' : ''
-            }`}
-            value={card.cvv || ""}
-            onChange={(e) => handleFieldChange('cvv', e.target.value)}
-            maxLength={4}
-            required
-            disabled={submitting}
-          />
         </label>
+        <input
+          type="text"
+          placeholder="123"
+          className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors font-mono ${
+            errors.cvv ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'
+          }`}
+          value={card.cvv || ""}
+          onChange={(e) => handleFieldChange('cvv', e.target.value)}
+          maxLength={4}
+          required
+          disabled={submitting}
+        />
         {errors.cvv && (
-          <p className="text-red-500 text-xs mt-1">{errors.cvv}</p>
+          <p className="text-red-500 text-xs mt-1 font-medium">{errors.cvv}</p>
         )}
       </div>
 
       <div>
-        <label className="text-sm text-gray-700">
+        <label className="block text-sm font-semibold text-gray-800 mb-2">
           CPF (Opcional) (xxx.xxx.xxx-xx)
-          <input
-            type="text"
-            placeholder="000.000.000-00"
-            className={`border p-2 rounded w-full focus:ring-2 focus:ring-blue-500 ${
-              errors.cpf ? 'border-red-500' : ''
-            }`}
-            value={card.cpf || ""}
-            onChange={(e) => handleFieldChange('cpf', e.target.value)}
-            maxLength={14}
-            disabled={submitting}
-          />
         </label>
+        <input
+          type="text"
+          placeholder="000.000.000-00"
+          className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+            errors.cpf ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'
+          }`}
+          value={card.cpf || ""}
+          onChange={(e) => handleFieldChange('cpf', e.target.value)}
+          maxLength={14}
+          disabled={submitting}
+        />
         {errors.cpf && (
-          <p className="text-red-500 text-xs mt-1">{errors.cpf}</p>
+          <p className="text-red-500 text-xs mt-1 font-medium">{errors.cpf}</p>
         )}
       </div>
 
-      <label className="text-sm text-gray-700">
-        Data de nascimento (Opcional)
+      <div>
+        <label className="block text-sm font-semibold text-gray-800 mb-2">
+          Data de nascimento (Opcional)
+        </label>
         <input
           type="date"
-          className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
+          className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
           value={card.birthDate || ""}
           onChange={(e) => setCard({ ...card, birthDate: e.target.value })}
           disabled={submitting}
+          title="Data de nascimento"
+          placeholder="dd/mm/aaaa"
         />
-      </label>
+      </div>
 
       <button
         type="submit"
         disabled={submitting || Object.keys(errors).length > 0}
-        className="bg-green-600 text-white rounded p-2 hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+        className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed mt-2"
       >
-        {submitting ? "Salvando no servidor..." : 
-         Object.keys(errors).length > 0 ? "Corrija os erros" : "Concluir Cadastro"}
+        {submitting ? "⏳ Salvando..." : 
+         Object.keys(errors).length > 0 ? "❌ Corrija os erros" : "✅ Concluir Cadastro"}
       </button>
     </form>
   );

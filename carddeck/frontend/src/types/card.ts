@@ -13,12 +13,12 @@ export interface Card {
   number: string;
   validThru: string;
   cvv: string;
-  brand: string;
+  brand: "Visa" | "Elo";
   bank: string;
   balance: number;
   creditLimit: number;
-  availableLimit: number;
-  transactions: Transaction[];
+  availableLimit?: number;
   cpf?: string;
   birthDate?: string;
+  transactions?: Transaction[];
 }
