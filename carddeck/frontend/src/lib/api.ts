@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3333';
+const API_BASE_URL = 'https://carddeck-backend.onrender.com';
 
 export interface Card {
   id: string;
@@ -25,9 +25,16 @@ export interface Transaction {
 
 export const cardsApi = {
   async getAll(): Promise<Card[]> {
-    const response = await fetch(`${API_BASE_URL}/cards`);
-    if (!response.ok) throw new Error('Erro ao buscar cartões');
-    return response.json();
+    try {
+      const response = await fetch(`${API_BASE_URL}/cards`);
+      if (!response.ok) {
+        throw new Error(`Erro ao buscar cartões: ${response.status} ${response.statusText}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Erro de conexão:', error);
+      throw new Error('Não foi possível conectar ao servidor. Verifique a URL.');
+    }
   },
 
   async create(cardData: Omit<Card, 'id' | 'availableLimit' | 'transactions'>): Promise<Card> {
@@ -55,7 +62,6 @@ export const cardsApi = {
     if (!response.ok) throw new Error('Erro ao deletar cartão');
   },
 
-  // Novos métodos para transações
   async addTransaction(cardId: string, transactionData: Omit<Transaction, 'id'>): Promise<Card> {
     const response = await fetch(`${API_BASE_URL}/cards/${cardId}/transactions`, {
       method: 'POST',
