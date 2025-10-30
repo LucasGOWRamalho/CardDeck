@@ -105,11 +105,11 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-        <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-semibold">Nova Transação</h2>
+        <div className="flex justify-between items-center p-6 border-b border-gray-300">
+          <h2 className="text-xl font-bold text-gray-900">Nova Transação</h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
+            className="text-gray-600 hover:text-gray-800 transition-colors"
             aria-label="Fechar modal"
             disabled={isSubmitting}
           >
@@ -119,7 +119,7 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="description" className="block text-sm font-bold text-gray-900 mb-2">
               Descrição *
             </label>
             <input
@@ -128,19 +128,19 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
               required
               value={formData.description}
               onChange={(e) => handleFieldChange('description', e.target.value)}
-              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors.description ? 'border-red-500' : 'border-gray-300'
+              className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors placeholder-gray-700 font-medium ${
+                errors.description ? 'border-red-600 bg-red-50' : 'border-gray-400 bg-white'
               }`}
               placeholder="O que você comprou?"
               disabled={isSubmitting}
             />
             {errors.description && (
-              <p className="text-red-500 text-xs mt-1">{errors.description}</p>
+              <p className="text-red-600 text-xs mt-1 font-bold">{errors.description}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="amount" className="block text-sm font-bold text-gray-900 mb-2">
               Valor (R$) *
             </label>
             <input
@@ -151,27 +151,27 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
               required
               value={formData.amount}
               onChange={(e) => handleFieldChange('amount', e.target.value)}
-              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors.amount ? 'border-red-500' : 'border-gray-300'
+              className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors placeholder-gray-700 font-medium ${
+                errors.amount ? 'border-red-600 bg-red-50' : 'border-gray-400 bg-white'
               }`}
               placeholder="0,00"
               disabled={isSubmitting}
             />
             {errors.amount && (
-              <p className="text-red-500 text-xs mt-1">{errors.amount}</p>
+              <p className="text-red-600 text-xs mt-1 font-bold">{errors.amount}</p>
             )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="category" className="block text-sm font-bold text-gray-900 mb-2">
                 Categoria
               </label>
               <select
                 id="category"
                 value={formData.category}
                 onChange={(e) => handleFieldChange('category', e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors bg-white text-gray-900 font-medium"
                 disabled={isSubmitting}
               >
                 {categories.map(category => (
@@ -183,28 +183,28 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
             </div>
 
             <div>
-              <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="type" className="block text-sm font-bold text-gray-900 mb-2">
                 Tipo *
               </label>
               <select
                 id="type"
                 value={formData.type}
                 onChange={(e) => handleFieldChange('type', e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors bg-white text-gray-900 font-medium"
                 required
                 disabled={isSubmitting}
               >
                 <option value="credit">Crédito</option>
                 <option value="debit">Débito</option>
               </select>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs font-semibold text-gray-700 mt-1">
                 {formData.type === 'credit' ? 'Usa limite de crédito' : 'Usa saldo disponível'}
               </p>
             </div>
           </div>
 
           <div>
-            <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="date" className="block text-sm font-bold text-gray-900 mb-2">
               Data *
             </label>
             <input
@@ -213,18 +213,18 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
               required
               value={formData.date}
               onChange={(e) => handleFieldChange('date', e.target.value)}
-              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors.date ? 'border-red-500' : 'border-gray-300'
+              className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors font-medium ${
+                errors.date ? 'border-red-600 bg-red-50' : 'border-gray-400 bg-white'
               }`}
               disabled={isSubmitting}
             />
             {errors.date && (
-              <p className="text-red-500 text-xs mt-1">{errors.date}</p>
+              <p className="text-red-600 text-xs mt-1 font-bold">{errors.date}</p>
             )}
           </div>
 
-          <div className="bg-green-50 p-3 rounded-lg">
-            <p className="text-sm text-green-700">
+          <div className="bg-green-100 p-3 rounded-lg border border-green-200">
+            <p className="text-sm font-semibold text-green-800">
               <strong>Informação:</strong> As transações estão sendo salvas no servidor.
             </p>
           </div>
@@ -234,14 +234,14 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="flex-1 py-3 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400"
+              className="flex-1 py-3 px-4 border-2 border-gray-400 text-gray-800 font-bold rounded-lg hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:text-gray-500"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 flex items-center justify-center gap-2"
+              className="flex-1 py-3 px-4 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg transition-colors disabled:bg-blue-400 flex items-center justify-center gap-2"
             >
               <Plus size={20} />
               {isSubmitting ? 'Salvando...' : 'Adicionar Transação'}
