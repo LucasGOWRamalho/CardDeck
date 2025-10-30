@@ -13,7 +13,7 @@ export interface Card {
   number: string;
   validThru: string;
   cvv: string;
-  brand: 'Visa' | 'Elo';
+  brand: string;
   bank: string;
   balance: number;
   creditLimit: number;

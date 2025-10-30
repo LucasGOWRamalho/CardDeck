@@ -18,6 +18,7 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
     date: new Date().toISOString().split('T')[0]
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const categories = [
     'compras',
@@ -30,29 +31,46 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
     'outros'
   ];
 
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    // Validar valor
+    if (!formData.amount || parseFloat(formData.amount) <= 0) {
+      newErrors.amount = 'Valor deve ser maior que zero';
+    }
+
+    // Validar descrição
+    if (!formData.description.trim()) {
+      newErrors.description = 'Descrição é obrigatória';
+    } else if (formData.description.trim().length < 2) {
+      newErrors.description = 'Descrição deve ter pelo menos 2 caracteres';
+    }
+
+    // Validar data (não pode ser futura)
+    const selectedDate = new Date(formData.date);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // Fim do dia atual
+    
+    if (selectedDate > today) {
+      newErrors.date = 'Data não pode ser futura';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validações
-    if (!formData.amount || parseFloat(formData.amount) <= 0) {
-      alert('Por favor, insira um valor válido maior que zero.');
-      return;
-    }
-
-    if (!formData.description.trim()) {
-      alert('Por favor, insira uma descrição para a transação.');
+    if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Simular uma requisição API com timeout
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Criar nova transação localmente
       const newTransaction: Transaction = {
-        id: `transaction-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `temp-${Date.now()}`,
         amount: parseFloat(formData.amount),
         description: formData.description.trim(),
         date: formData.date,
@@ -60,19 +78,27 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
         type: formData.type
       };
 
-      console.log('Nova transação criada:', newTransaction);
+      console.log('Enviando transação para o backend:', newTransaction);
       
-      // Chamar a função de callback para adicionar a transação
       onTransactionAdded(newTransaction);
-      
-      // Fechar o modal
-      onClose();
       
     } catch (error) {
       console.error('Erro ao adicionar transação:', error);
       alert('Erro ao adicionar transação. Tente novamente.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleFieldChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Remover erro do campo quando usuário começar a digitar
+    if (errors[field]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
     }
   };
 
@@ -85,6 +111,7 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 transition-colors"
             aria-label="Fechar modal"
+            disabled={isSubmitting}
           >
             <X size={24} />
           </button>
@@ -100,10 +127,16 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
               type="text"
               required
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              onChange={(e) => handleFieldChange('description', e.target.value)}
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                errors.description ? 'border-red-500' : 'border-gray-300'
+              }`}
               placeholder="O que você comprou?"
+              disabled={isSubmitting}
             />
+            {errors.description && (
+              <p className="text-red-500 text-xs mt-1">{errors.description}</p>
+            )}
           </div>
 
           <div>
@@ -117,10 +150,16 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
               min="0.01"
               required
               value={formData.amount}
-              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              onChange={(e) => handleFieldChange('amount', e.target.value)}
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                errors.amount ? 'border-red-500' : 'border-gray-300'
+              }`}
               placeholder="0,00"
+              disabled={isSubmitting}
             />
+            {errors.amount && (
+              <p className="text-red-500 text-xs mt-1">{errors.amount}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -131,8 +170,9 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
               <select
                 id="category"
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                onChange={(e) => handleFieldChange('category', e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                disabled={isSubmitting}
               >
                 {categories.map(category => (
                   <option key={category} value={category}>
@@ -149,13 +189,17 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
               <select
                 id="type"
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value as 'credit' | 'debit' })}
+                onChange={(e) => handleFieldChange('type', e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
+                disabled={isSubmitting}
               >
                 <option value="credit">Crédito</option>
                 <option value="debit">Débito</option>
               </select>
+              <p className="text-xs text-gray-500 mt-1">
+                {formData.type === 'credit' ? 'Usa limite de crédito' : 'Usa saldo disponível'}
+              </p>
             </div>
           </div>
 
@@ -168,14 +212,20 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
               type="date"
               required
               value={formData.date}
-              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              onChange={(e) => handleFieldChange('date', e.target.value)}
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                errors.date ? 'border-red-500' : 'border-gray-300'
+              }`}
+              disabled={isSubmitting}
             />
+            {errors.date && (
+              <p className="text-red-500 text-xs mt-1">{errors.date}</p>
+            )}
           </div>
 
-          <div className="bg-blue-50 p-3 rounded-lg">
-            <p className="text-sm text-blue-700">
-              <strong>Informação:</strong> As transações estão sendo salvas localmente no navegador.
+          <div className="bg-green-50 p-3 rounded-lg">
+            <p className="text-sm text-green-700">
+              <strong>Informação:</strong> As transações estão sendo salvas no servidor.
             </p>
           </div>
 
@@ -183,7 +233,8 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              disabled={isSubmitting}
+              className="flex-1 py-3 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:text-gray-400"
             >
               Cancelar
             </button>
@@ -193,7 +244,7 @@ export function AddTransaction({ cardId, onTransactionAdded, onClose }: AddTrans
               className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 flex items-center justify-center gap-2"
             >
               <Plus size={20} />
-              {isSubmitting ? 'Adicionando...' : 'Adicionar Transação'}
+              {isSubmitting ? 'Salvando...' : 'Adicionar Transação'}
             </button>
           </div>
         </form>

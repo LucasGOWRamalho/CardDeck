@@ -1,9 +1,12 @@
+// JÁ ATUALIZADO - Wallet.tsx com botão dentro do card
 "use client";
 import { Card } from "../types/card";
-import { ChevronDown, ChevronUp, CreditCard, Search } from "lucide-react";
+import { ChevronDown, ChevronUp, CreditCard, Search, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Variants } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
+import { DeleteCardModal } from "./DeleteCardModal";
+import { useCard } from "../context/CardContext";
 
 interface WalletProps {
   cards: Card[];
@@ -14,7 +17,10 @@ interface WalletProps {
 
 export function Wallet({ cards, isOpen, onToggle, onCardSelect }: WalletProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [cardToDelete, setCardToDelete] = useState<Card | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const walletRef = useRef<HTMLDivElement>(null);
+  const { deleteCard } = useCard();
 
   // Fechar a carteira ao clicar fora
   useEffect(() => {
@@ -102,6 +108,20 @@ export function Wallet({ cards, isOpen, onToggle, onCardSelect }: WalletProps) {
   // Função para lidar com o clique nos cartões (evita fechar a carteira)
   const handleCardClick = (card: Card) => {
     onCardSelect(card);
+  };
+
+  // Função para iniciar a exclusão
+  const handleDeleteClick = (card: Card, event: React.MouseEvent) => {
+    event.stopPropagation(); // Impede que o clique propague para o cartão
+    setCardToDelete(card);
+    setShowDeleteModal(true);
+  };
+
+  // Função para executar a exclusão
+  const handleConfirmDelete = async (cardId: string) => {
+    await deleteCard(cardId);
+    setShowDeleteModal(false);
+    setCardToDelete(null);
   };
 
   return (
@@ -213,16 +233,27 @@ export function Wallet({ cards, isOpen, onToggle, onCardSelect }: WalletProps) {
                     {filteredCards.map((card, index) => (
                       <motion.div
                         key={card.id}
-                        className="relative"
+                        className="relative group"
                         custom={index}
                         variants={cardVariants}
                         initial="hidden"
                         animate="visible"
                         whileTap="tap"
-                        onClick={() => handleCardClick(card)}
                       >
                         {/* Cartão estilo "guardado" na carteira */}
-                        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-lg p-3 text-white shadow-lg cursor-pointer border-2 border-white/20 hover:border-white/40 transition-all duration-200">
+                        <div 
+                          className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-lg p-3 text-white shadow-lg cursor-pointer border-2 border-white/20 hover:border-white/40 transition-all duration-200 relative"
+                          onClick={() => handleCardClick(card)}
+                        >
+                          {/* Botão de excluir - DENTRO do card no canto superior direito */}
+                          <button
+                            onClick={(e) => handleDeleteClick(card, e)}
+                            className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600 z-10 shadow-lg"
+                            title="Excluir cartão"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+
                           <div className="flex justify-between items-start">
                             <div className="text-xs opacity-80 font-semibold">CARD DECK</div>
                             <div className="text-xs bg-white text-blue-600 px-2 py-1 rounded font-semibold">
@@ -268,7 +299,9 @@ export function Wallet({ cards, isOpen, onToggle, onCardSelect }: WalletProps) {
                   <span className="text-amber-200 text-xs">
                     {searchTerm ? `${filteredCards.length} de ` : ''}{cards.length} cartão{cards.length !== 1 ? 's' : ''}
                   </span>
-               
+                  <span className="text-amber-300 text-xs">
+                    Passe o mouse sobre um cartão para excluir
+                  </span>
                 </motion.div>
               )}
             </motion.div>
@@ -290,6 +323,19 @@ export function Wallet({ cards, isOpen, onToggle, onCardSelect }: WalletProps) {
           </motion.div>
         )}
       </motion.div>
+
+      {/* Modal de Exclusão */}
+      {cardToDelete && (
+        <DeleteCardModal
+          card={cardToDelete}
+          onDelete={handleConfirmDelete}
+          onClose={() => {
+            setShowDeleteModal(false);
+            setCardToDelete(null);
+          }}
+          isOpen={showDeleteModal}
+        />
+      )}
     </div>
   );
 }

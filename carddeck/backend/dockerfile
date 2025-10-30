@@ -1,16 +1,38 @@
-FROM node:18-alpine
+# Multi-stage build para reduzir vulnerabilidades e tamanho
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Copiar arquivos de configuração primeiro (cache de layers)
 COPY package*.json ./
 COPY tsconfig*.json ./
 
-RUN npm install
+# Instalar TODAS as dependências (incluindo dev para build)
+RUN npm ci
 
+# Copiar código fonte
 COPY . .
 
+# Build da aplicação
 RUN npm run build
+
+# Stage final - imagem mínima
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copiar apenas o necessário para produção
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY package*.json ./
+
+# Criar usuário não-root para segurança
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001 && \
+    chown -R nextjs:nodejs /app
+
+USER nextjs
 
 EXPOSE 3333
 
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "dist/main"]
