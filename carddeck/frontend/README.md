@@ -199,7 +199,7 @@ Wallet → Hover Card → Delete → Confirmação → Atualização da Lista
 
 ```bash
 # Clonar o projeto
-git clone https://github.com/seuusuario/carddeck.git
+git clone https://github.com/LucasGOWRamalho/CardDeck.git
 
 # Entrar na pasta do frontend
 cd carddeck
