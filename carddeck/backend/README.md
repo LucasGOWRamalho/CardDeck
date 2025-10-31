@@ -44,7 +44,7 @@ src/
 
 ### 1️⃣ Clonar o Projeto
 ```bash
-git clone <url-do-repositório>
+git clone https://github.com/LucasGOWRamalho/CardDeck.git
 cd carddeck/backend
 ```
 
